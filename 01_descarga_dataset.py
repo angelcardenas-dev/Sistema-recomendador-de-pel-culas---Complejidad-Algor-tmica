@@ -1,13 +1,13 @@
 # ============================================================
 # Verificación e instalación de librerías necesarias
 # ============================================================
-import os
+import os # para interactuar con el sistema operativo
 import zipfile
-import urllib.request
+import urllib.request # para realizar peticiones a internet
 
-import importlib
-import subprocess
-import sys
+import importlib # Permite interactuar con el sistema de importaciones de Python de forma interna (para verificar si una librería existe)
+import subprocess # Permite ejecutar comandos en la terminal o consola de tu computadora desde el propio código de Python.
+import sys # Da acceso a variables y funciones específicas del sistema (como la ruta exacta del ejecutable de Python que se está usando).
 
 librerias = {
     "pandas": "pandas",

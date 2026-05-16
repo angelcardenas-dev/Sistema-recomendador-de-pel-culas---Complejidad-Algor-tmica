@@ -28,20 +28,20 @@ def obtener_url_poster(tmdb_id):
         pass
     return None
 
-# 2. El "Cerebro" que acepta tus calificaciones manuales [cite: 136, 137, 161]
+# 2. El "Cerebro" que acepta las calificaciones manuales [cite: 136, 137, 161]
 def obtener_recomendaciones_interactivas(G, mis_calificaciones, rating_min=4.0, top_n=10):
     """
     mis_calificaciones: Diccionario tipo {'M_123': 5.0, 'M_456': 4.0} [cite: 137]
     """
-    ID_INVITADO = "U_NUEVO" # Tu nodo temporal [cite: 116, 136]
+    ID_INVITADO = "U_NUEVO" # El nodo temporal [cite: 116, 136]
 
-    # Insertar tus datos temporalmente en el grafo [cite: 116, 161]
+    # Insertar datos temporalmente en el grafo [cite: 116, 161]
     G.add_node(ID_INVITADO, tipo="usuario", bipartite=0)
     for m_id, calif in mis_calificaciones.items():
         if G.has_node(m_id):
             G.add_edge(ID_INVITADO, m_id, rating=float(calif))
     
-    # Nivel 1: Tus películas positivas [cite: 45, 53]
+    # Nivel 1: Las películas positivas [cite: 45, 53]
     pos_usuario = [m for m in G.neighbors(ID_INVITADO) if G[ID_INVITADO][m].get('rating', 0) >= rating_min]
     
     if not pos_usuario:
