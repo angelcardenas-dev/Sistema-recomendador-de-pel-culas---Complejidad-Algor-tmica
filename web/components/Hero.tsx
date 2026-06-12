@@ -1,0 +1,1 @@
+// Sección inicial tipo landing

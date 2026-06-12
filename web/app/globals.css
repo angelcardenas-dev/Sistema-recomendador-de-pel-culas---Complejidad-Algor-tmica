@@ -1,0 +1,11 @@
+/* Estilos globales de la web */
+
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+}

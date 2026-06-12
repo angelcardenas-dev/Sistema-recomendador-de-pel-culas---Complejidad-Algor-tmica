@@ -3,7 +3,7 @@ from PIL import Image, ImageTk # Para manejar las imágenes
 import requests
 import io
 import threading  # <--- Hilos integrados para segundo plano
-from A5_obtener_posters_recomendacion import cargar_recursos, obtener_recomendaciones_interactivas, obtener_url_poster
+from obtener_posters_recomendacion import cargar_recursos, obtener_recomendaciones_interactivas, obtener_url_poster
 
 class AppRecomendacion(ctk.CTk):
     def __init__(self):
