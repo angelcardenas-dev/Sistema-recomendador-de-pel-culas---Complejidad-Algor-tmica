@@ -1,33 +1,102 @@
+"use client";
+
+import { useState } from "react";
+
+import Hero from "@/components/Hero";
+import HowItWorks from "@/components/HowItWorks";
+import MovieSearch from "@/components/MovieSearch";
+import RatingPanel from "@/components/RatingPanel";
+import RecommendationResults from "@/components/RecommendationResults";
+import { getRecommendations } from "@/lib/api";
+import type { RatedMovie, RecommendationResponse } from "@/lib/types";
+
 export default function Home() {
+  const [ratedMovies, setRatedMovies] = useState<RatedMovie[]>([]);
+  const [result, setResult] = useState<RecommendationResponse | null>(null);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [error, setError] = useState("");
+
+  function addMovie(movie: RatedMovie) {
+    setRatedMovies((current) => {
+      const exists = current.some((item) => item.movieId === movie.movieId);
+
+      if (exists) {
+        return current;
+      }
+
+      return [...current, movie];
+    });
+  }
+
+  function updateRating(movieId: number, rating: number) {
+    setRatedMovies((current) =>
+      current.map((movie) =>
+        movie.movieId === movieId ? { ...movie, rating } : movie
+      )
+    );
+  }
+
+  function removeMovie(movieId: number) {
+    setRatedMovies((current) =>
+      current.filter((movie) => movie.movieId !== movieId)
+    );
+  }
+
+  async function generateRecommendations() {
+    try {
+      setLoadingRecommendations(true);
+      setError("");
+
+      const response = await getRecommendations(ratedMovies, 10, 10);
+      setResult(response);
+    } catch {
+      setError(
+        "No se pudo conectar con la API. Verifica que el backend esté corriendo en http://127.0.0.1:8000"
+      );
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <section className="mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 text-center">
-        <p className="mb-4 rounded-full border border-cyan-400/40 px-4 py-2 text-sm text-cyan-300">
-          Complejidad Algorítmica · TB2
-        </p>
+      <Hero />
+      <HowItWorks />
 
-        <h1 className="max-w-4xl text-5xl font-bold tracking-tight md:text-7xl">
-          MovieRec Pro
-        </h1>
+      <section id="recomendador" className="px-6 py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10">
+            <h2 className="text-3xl font-black md:text-4xl">
+              Prueba el recomendador
+            </h2>
+            <p className="mt-4 max-w-2xl text-slate-300">
+              Busca películas, califícalas y genera recomendaciones usando la
+              API desarrollada con FastAPI.
+            </p>
+          </div>
 
-        <p className="mt-6 max-w-2xl text-lg text-slate-300">
-          Sistema recomendador de películas basado en filtrado colaborativo,
-          correlación de Pearson y ponderación por género.
-        </p>
+          {error && (
+            <div className="mb-6 rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-red-200">
+              {error}
+            </div>
+          )}
 
-        <a
-          href="#recomendador"
-          className="mt-8 rounded-xl bg-cyan-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300"
-        >
-          Probar recomendador
-        </a>
-      </section>
+          <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+            <MovieSearch ratedMovies={ratedMovies} onAddMovie={addMovie} />
 
-      <section id="recomendador" className="mx-auto max-w-6xl px-6 py-20">
-        <h2 className="text-3xl font-bold">Recomendador</h2>
-        <p className="mt-3 text-slate-300">
-          Aquí se integrará el buscador, calificador y resultados de películas.
-        </p>
+            <RatingPanel
+              ratedMovies={ratedMovies}
+              loading={loadingRecommendations}
+              onUpdateRating={updateRating}
+              onRemoveMovie={removeMovie}
+              onGenerateRecommendations={generateRecommendations}
+            />
+          </div>
+
+          <div className="mt-6">
+            <RecommendationResults result={result} />
+          </div>
+        </div>
       </section>
     </main>
   );

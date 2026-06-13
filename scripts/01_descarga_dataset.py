@@ -1,74 +1,54 @@
-# ============================================================
-# Verificación e instalación de librerías necesarias
-# ============================================================
-import os # para interactuar con el sistema operativo
+"""
+Descarga y extracción del dataset MovieLens.
+
+Antes de ejecutar este script, instalar dependencias con:
+python -m pip install -r requirements.txt
+"""
+
 import zipfile
-import urllib.request # para realizar peticiones a internet
+from pathlib import Path
 
-import importlib # Permite interactuar con el sistema de importaciones de Python de forma interna (para verificar si una librería existe)
-import subprocess # Permite ejecutar comandos en la terminal o consola de tu computadora desde el propio código de Python.
-import sys # Da acceso a variables y funciones específicas del sistema (como la ruta exacta del ejecutable de Python que se está usando).
-
-librerias = {
-    "pandas": "pandas",
-    "numpy": "numpy",
-    "networkx": "networkx",
-    "matplotlib": "matplotlib",
-    "pyvis": "pyvis",
-    "openpyxl": "openpyxl",
-    "ipykernel": "ipykernel",
-    "customtkinter": "customtkinter",  # Para la interfaz
-    "requests": "requests",            # Para las consultas a la API de TMDB
-    "PIL": "pillow"                    # Para el manejo de imágenes y logos
-}
-
-def instalar_si_falta(paquete_import, paquete_pip):
-    try:
-        importlib.import_module(paquete_import)
-        print(f"{paquete_pip} ya está instalado.")
-    except ImportError:
-        print(f"{paquete_pip} no está instalado. Instalando...")
-        subprocess.check_call([
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            paquete_pip
-        ])
-        print(f"{paquete_pip} instalado correctamente.")
-
-for paquete_import, paquete_pip in librerias.items():
-    instalar_si_falta(paquete_import, paquete_pip)
+import requests
 
 
-# ============================================================
-# CONFIGURACIÓN INICIAL DE DIRECTORIOS
-# ============================================================
-# Definimos 'data' como la carpeta base del proyecto
+DATA_DIR = Path("data")
+DATASET_URL = "https://files.grouplens.org/datasets/movielens/ml-latest-small.zip"
+ZIP_PATH = DATA_DIR / "ml-latest-small.zip"
 
-if not os.path.exists('data'):
-    os.makedirs('data')
-    print("Carpeta 'data' creada con éxito.")
 
-# 1. Descargar dataset movieLens
-url = "https://files.grouplens.org/datasets/movielens/ml-latest-small.zip"
-zip_path = "ml-latest-small.zip"
-extract_path = "data"
+def descargar_dataset():
+    DATA_DIR.mkdir(exist_ok=True)
 
-# Descargar el archivo ZIP
-print(f"Descargando {zip_path}...")
-urllib.request.urlretrieve(url, zip_path)
+    if ZIP_PATH.exists():
+        print("El ZIP del dataset ya existe.")
+        return
 
-# Descomprimir el ZIP y almacenar los archivos en la carpeta 'ml-latest-small' y esta a a su vez dentro de la carpeta 'data'
-with zipfile.ZipFile(zip_path, "r") as zip_ref:
-    zip_ref.extractall(extract_path)
+    print("Descargando dataset MovieLens...")
+    response = requests.get(DATASET_URL, timeout=30)
+    response.raise_for_status()
 
-print(f"Dataset descomprimido en la carpeta: {extract_path}")
+    ZIP_PATH.write_bytes(response.content)
+    print("Dataset descargado correctamente.")
 
-# 4. Verificación
-# Listamos el contenido de data/ml-latest-small para asegurar que la ruta es correcta
-# para tus siguientes scripts (02 y 03)
-check_path = os.path.join(extract_path, "ml-latest-small")
-if os.path.exists(check_path):
-    print("Contenido verificado en:", check_path)
-    print(os.listdir(check_path))
+
+def extraer_dataset():
+    destino = DATA_DIR / "ml-latest-small"
+
+    if destino.exists():
+        print("El dataset ya fue extraído.")
+        return
+
+    print("Extrayendo dataset...")
+    with zipfile.ZipFile(ZIP_PATH, "r") as zip_ref:
+        zip_ref.extractall(DATA_DIR)
+
+    print("Dataset extraído correctamente.")
+
+
+def main():
+    descargar_dataset()
+    extraer_dataset()
+
+
+if __name__ == "__main__":
+    main()
