@@ -13,6 +13,7 @@ MOVIELENS_DIR = DATA_DIR / "ml-latest-small"
 RATINGS_PATH = MOVIELENS_DIR / "ratings.csv"
 MOVIES_PATH = MOVIELENS_DIR / "movies.csv"
 PELICULAS_2000_PATH = DATA_DIR / "peliculas_2000.csv"
+LINKS_PATH = MOVIELENS_DIR / "links.csv"
 
 
 def cargar_ratings():
@@ -48,6 +49,22 @@ def cargar_movies():
 
     return pd.read_csv(MOVIES_PATH)
 
+def cargar_links():
+    """
+    Carga el archivo links.csv de MovieLens.
+
+    Este archivo permite relacionar:
+        movieId de MovieLens
+        tmdbId de TMDB
+
+    Si no existe, retorna un DataFrame vacío.
+    """
+    if not LINKS_PATH.exists():
+        return pd.DataFrame(columns=["movieId", "imdbId", "tmdbId"])
+
+    links = pd.read_csv(LINKS_PATH)
+
+    return links
 
 def cargar_peliculas_filtradas():
     """

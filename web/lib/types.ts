@@ -3,6 +3,7 @@ export type Movie = {
   movieId: number;
   title: string;
   genres: string;
+  poster_url?: string | null;
   rating_promedio?: number;
   cantidad_votos?: number;
 };
@@ -12,6 +13,7 @@ export type RatedMovie = {
   title: string;
   genres: string;
   rating: number;
+  poster_url?: string | null;
 };
 
 export type SimilarUser = {
@@ -24,6 +26,7 @@ export type Recommendation = {
   movieId: number;
   title: string;
   genres: string;
+  poster_url?: string | null;
   score_pearson?: number;
   score_genero?: number;
   score_final?: number;

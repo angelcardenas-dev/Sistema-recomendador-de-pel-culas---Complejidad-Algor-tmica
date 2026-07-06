@@ -33,7 +33,7 @@ export default function MovieSearch({
     try {
       setLoading(true);
       setMessage("");
-      const results = await searchMovies(query, 8);
+      const results = await searchMovies(query, 9);
       setMovies(results);
 
       if (results.length === 0) {
@@ -50,7 +50,7 @@ export default function MovieSearch({
     try {
       setLoading(true);
       setMessage("");
-      const results = await getPopularMovies(8);
+      const results = await getPopularMovies(9);
       setMovies(results);
     } catch {
       setMessage("No se pudieron cargar películas populares.");
@@ -69,6 +69,7 @@ export default function MovieSearch({
       movieId: movie.movieId,
       title: movie.title,
       genres: movie.genres,
+      poster_url: movie.poster_url,
       rating: 4.5,
     });
   }
@@ -124,7 +125,7 @@ export default function MovieSearch({
         </div>
       )}
 
-      <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3">
         {movies.map((movie) => (
           <MovieCard
             key={movie.movieId}

@@ -19,3 +19,7 @@ Thumbs.db
 # Archivos temporales
 *.tmp
 *.log
+
+# Archivos de configuración de entorno
+.env
+.env.local

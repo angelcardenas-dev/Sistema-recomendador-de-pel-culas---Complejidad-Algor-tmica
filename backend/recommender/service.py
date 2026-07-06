@@ -13,7 +13,10 @@ from backend.recommender.data_loader import (
     obtener_catalogo_peliculas,
     buscar_peliculas,
     validar_calificaciones_usuario,
+    cargar_links,
 )
+
+from backend.recommender.tmdb_client import agregar_posters_a_dataframe
 
 
 # Importaciones opcionales.
@@ -49,12 +52,17 @@ def cargar_datos():
     if _DATA_CACHE is None:
         matriz, ratings, movies = preparar_matriz_usuario_pelicula()
         catalogo = obtener_catalogo_peliculas(movies)
+        links = cargar_links()
+
+        if not links.empty:
+            links = links[links["movieId"].isin(movies["movieId"])]
 
         _DATA_CACHE = {
             "matriz": matriz,
             "ratings": ratings,
             "movies": movies,
             "catalogo": catalogo,
+            "links": links,
         }
 
     return _DATA_CACHE
@@ -96,7 +104,14 @@ def buscar_peliculas_servicio(texto, limite=10):
 
     columnas = ["movieId", "title", "genres"]
 
-    return limpiar_dataframe_para_json(resultados[columnas])
+    resultados = resultados[columnas]
+
+    resultados = agregar_posters_a_dataframe(
+        df=resultados,
+        links=datos["links"]
+    )
+
+    return limpiar_dataframe_para_json(resultados)
 
 
 def obtener_peliculas_populares_servicio(limite=10):
@@ -135,7 +150,14 @@ def obtener_peliculas_populares_servicio(limite=10):
         "cantidad_votos"
     ]
 
-    return limpiar_dataframe_para_json(populares[columnas])
+    populares = populares[columnas]
+
+    populares = agregar_posters_a_dataframe(
+        df=populares,
+        links=datos["links"]
+    )
+
+    return limpiar_dataframe_para_json(populares)
 
 
 def normalizar_calificaciones(calificaciones):
@@ -401,6 +423,11 @@ def recomendar_servicio(
 
     recomendaciones = recomendaciones[columnas_recomendaciones]
 
+    recomendaciones = agregar_posters_a_dataframe(
+        df=recomendaciones,
+        links=datos["links"]
+    )
+    
     return {
         "mensaje": "Recomendaciones generadas correctamente.",
         "ratings_validos": len(calificaciones_validas),
