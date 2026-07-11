@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 from fastapi import FastAPI, Query
@@ -19,12 +20,23 @@ app = FastAPI(
 )
 
 
+# URL del frontend desplegado.
+# En local permite localhost.
+# En producción leerá FRONTEND_URL desde Render.
+frontend_url = os.getenv("FRONTEND_URL", "")
+
+allowed_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
