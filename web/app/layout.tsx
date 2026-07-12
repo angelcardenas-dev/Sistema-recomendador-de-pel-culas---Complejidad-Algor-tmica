@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "MovieRec Pro",
-  description: "Sistema recomendador de películas con Pearson y géneros",
+  description:
+    "Sistema recomendador de películas con Pearson, géneros y TMDB",
 };
 
 export default function RootLayout({
@@ -13,7 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        {children}
+
+        {/* Registra visitantes y vistas de página en Vercel */}
+        <Analytics />
+      </body>
     </html>
   );
 }
